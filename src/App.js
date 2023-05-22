@@ -6,8 +6,7 @@ const data = {
   pText: "I'm a cute chatbot!",
   p2Text: "I can help you with your horoscope",
   conversation: [
-    { role: "assistant", content: "Hello, how can I help you today?" },
-    { role: "user", content: "I need a horoscope reading" },
+
   ],
   isLoading: false
 };
@@ -16,53 +15,45 @@ function App() {
   const [conversation, setConversation] = React.useState(data.conversation);
   const [isLoading, setIsLoading] = React.useState(data.isLoading);
 
-  
+
 
 
   const updateUserMessages = (newMessage) => {
     if (!newMessage) {
       return;
     }
-setIsLoading(true) //we set loading to true here to display the balls in the assistant message bubble while we wait for the response from the server
-    const newConversation =[
+    setIsLoading(true) //we set loading to true here to display the balls in the assistant message bubble while we wait for the response from the server
+    const newConversation = [
       ...conversation,
       { role: "user", content: newMessage }
-        ];
+    ];
+    // send POST request to local server with the conversation payload for chat response 
+    // "http://localhost:8088/chat", {//i will fill in this function later
+    // it is necessary to temporarily use 'loading' as a message until we get a reponse from the server if we want to display the ellipses 
 
+    setConversation([...newConversation])
 
-        
-        // send POST request to local server with the conversation payload for chat response 
-        // "http://localhost:8088/chat", {//i will fill in this function later
-        // it is necessary to temporarily use 'loading' as a message until we get a reponse from the server if we want to display the ellipses 
-        
-        setConversation = [...newConversation]
-        
-        //then i will set the assistant message in this conversation with the actual response from the assistant  
+    //then i will set the assistant message in this conversation with the actual response from the assistant  
 
-        
-fetch('http://localhost:8088/chat', {
-  method: "POST",
-  headers: {
-    "Content-type": "application/json"
-  },
-  body: JSON.stringify(newConversation)
-})
-.then(res => res.json())
-.then((response) => setConversation([
-  ...newConversation,
-  {role:"assistant", content: response}
-]))
-
-// setConversation([
-//     ...conversation, 
-//     { role: "assistant", content: response }
-//   ]);
+    fetch('http://localhost:8088/chat', {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: JSON.stringify(newConversation)
+    })
+      .then(res => res.json())
+      .then((response) =>
+        setConversation([
+          ...newConversation,
+          { role: "assistant", content: response }
+        ]))
+  };
 
 
 
 
 
-  }; 
 
   const showMessages = () => {
     return conversation.map((message, index) => (
@@ -78,7 +69,6 @@ fetch('http://localhost:8088/chat', {
   const onInput = (event) => {
     if (event.key === "Enter") {
       const userInput = event.target.value;
-
       updateUserMessages(userInput);
       event.target.value = "";
     }
